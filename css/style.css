@@ -1,0 +1,126 @@
+#bg {
+	display: block;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	z-index:1001;
+	-moz-opacity: 0.6;
+	opacity:.60;
+	filter: alpha(opacity=60);
+}
+
+#show {
+	display: block;
+	position: absolute;
+	top: 15%;
+	left: 30%;
+	/*border: 8px solid #E8E9F7;
+	background-color: white;*/
+	z-index:1002;
+	overflow: hidden;
+}
+#loading{
+	display: none;
+	position: absolute;
+	top: 30%;
+	left: 26%;
+	z-index: 1003;
+}
+img{
+	outline: none;
+}
+#info{
+	color:red;
+	/*background: #fff;*/
+	margin: 0 auto;
+	text-align: center;
+	margin-left: -35%;
+	font-size: 22px;
+	display: none;
+}
+#failnow{
+	color:red;
+	/*background: #fff;*/
+	margin: 0 auto;
+	text-align: center;
+	margin-left: -35%;
+	font-size: 22px;
+	display: none;
+}
+#failvip{
+	/*width: 588px;*/
+
+	/*display:none;*/
+	color:red;
+	/*background: #fff;*/
+	margin: 0 auto;
+	text-align: center;
+	margin-left: -35%;
+	font-size: 22px;
+	display: none;
+	
+}
+
+
+
+
+
+
+
+
+#pic_info
+{
+width:200px;
+height:35px;
+position:relative;
+margin-left: 19%;
+margin-top: 4px;
+animation:mymove 3s infinite;
+-moz-animation:mymove 5s infinite; /* Firefox */
+-webkit-animation:mymove 3s infinite; /* Safari and Chrome */
+-o-animation:mymove 5s infinite; /* Opera */
+}
+
+@keyframes mymove
+{
+0%   {top:-40px;left: 30px;}
+45% {width: 200px;height: 35px;transform:rotate(0deg);top:-100px;left: 30px;}
+50%  {transform:rotate(9deg);width: 220px;height: 40px;top:-100px;left: 30px;}
+55%  {transform:rotate(-9deg);width: 220px;height: 40px;top:-100px;left: 30px;}
+60% {width: 220px;height: 40px;transform:rotate(0deg);top:-100px;left: 30px;}
+100% {width: 200px;height: 35px;top:-40px;left: 30px;}
+
+}
+
+@-moz-keyframes mymove /* Firefox */
+{
+0%   {top:0px;left: 30px;}
+45% {width: 200px;height: 35px;transform:rotate(0deg);top:-3px;left: 25px;}
+50%  {transform:rotate(9deg);width: 220px;height: 40px;top:-3px;left: 25px;}
+55%  {transform:rotate(-9deg);width: 220px;height: 40px;top:-3px;left: 25	px;}
+60% {width: 220px;height: 40px;transform:rotate(0deg);top:-3px;left: 25px;}
+100% {width: 200px;height: 35px;top:0px;left: 30px;}
+}
+
+@-webkit-keyframes mymove /* Safari and Chrome */
+{
+0%   {top:-90px;left: 30px;width: 140px;height: 24px;}
+45% {width: 154px;height: 28px;transform:rotate(0deg);top:-95px;left: 30px;}
+50%  {transform:rotate(9deg);width: 154px;height: 28px;top:-95px;left: 30px;}
+55%  {transform:rotate(-9deg);width: 154px;height: 28px;top:-95px;left: 30px;}
+60% {width: 154px;height: 28px;transform:rotate(0deg);top:-95px;left: 30px;}
+100% {width: 140px;height: 24px;top:-90px;left: 30px;}
+}
+
+@-o-keyframes mymove /* Opera */
+{
+0%   {top:0px;left: 30px;}
+45% {width: 200px;height: 35px;transform:rotate(0deg);top:-3px;left: 25px;}
+50%  {transform:rotate(9deg);width: 220px;height: 40px;top:-3px;left: 25px;}
+55%  {transform:rotate(-9deg);width: 220px;height: 40px;top:-3px;left: 25	px;}
+60% {width: 220px;height: 40px;transform:rotate(0deg);top:-3px;left: 25px;}
+100% {width: 200px;height: 35px;top:0px;left: 30px;}
+}
