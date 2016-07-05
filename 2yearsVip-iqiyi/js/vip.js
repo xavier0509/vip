@@ -7,6 +7,7 @@ var accesstoken = null;
   // var  val =thisURL.split('?')[1];  
   // var showval= val.split("=")[1]; 
 var app = {
+
     canonical_uri:function(src, base_path) 
     {
         var root_page = /^[^?#]*\//.exec(location.href)[0],
@@ -52,6 +53,7 @@ var app = {
         app.receivedEvent('deviceready');
         coocaaosapi.hasCoocaaUserLogin(function(message) {
             console.log("haslogin " + message.haslogin);
+
             loginstatus = message.haslogin;
             console.log("haslogin " + loginstatus);
                 if (loginstatus == "false") {
@@ -101,7 +103,7 @@ var app = {
 app.initialize();
 
 function experience(){
-    console.log("success");
+    console.log("close success");
     navigator.app.exitApp();//退出问题！！！！！
 }
 
@@ -111,7 +113,7 @@ function experienceonclick(){
     // console.log(pigsrc);
     console.log("status"+loginstatus);
     if(loginstatus=="false"){
-        coocaaosapi.startThirdQQAccount(function(message) {console.log(message); },function(error) { console.log(error);});
+        coocaaosapi.startUserSettingAndFinish(function(message)  {console.log(message); },function(error){console.log(error);});
         // document.getElementById('getimmediate').src="images/3.png";
         coocaaosapi.addUserChanggedListener(function(message){
             console.log(message);
@@ -131,30 +133,26 @@ function experienceonclick(){
            
            qqtoken1 = JSON.parse(qqinfo);
            console.log(qqtoken1);
-           if (qqtoken1!=""&&qqtoken1!=null) {
             document.getElementById('loading').style.display="block";
-               qqtoken = qqtoken1[0].openId;
-               console.log(qqtoken);
+            // qqtoken = qqtoken1[0].openId;
+            console.log("welcome coocaa");
 
-               coocaaosapi.getDeviceInfo(function(message) {
-                deviceInfo = message;
-                
-                console.log(JSON.stringify(deviceInfo));
-                //---------------获取usertokenid-----------------
-                coocaaosapi.getUserAccessToken(function(message) {
-                    accesstoken = message.accesstoken;
-                    console.log("usertoken " + message.accesstoken);
-                    // document.getElementById('usertokenid').value = JSON.stringify(message);
-                },function(error) { console.log(error);})
-                //-------------http请求
+            coocaaosapi.getDeviceInfo(function(message) {
+            deviceInfo = message;
+
+            console.log(JSON.stringify(deviceInfo));
+            //---------------获取usertokenid-----------------
+            coocaaosapi.getUserAccessToken(function(message) {
+                accesstoken = message.accesstoken;
+                console.log("usertoken " + message.accesstoken);
                 sendHTTP1();
+                // document.getElementById('usertokenid').value = JSON.stringify(message);
+            },function(error) { console.log(error);})
+            //-------------http请求
+            
             // document.getElementById('systeminfoid').value = JSON.stringify(message);
-                },function(error) { console.log(error);});
-
-            }
-            else{
-                coocaaosapi.startThirdQQAccount(function(message) {console.log(message); },function(error) { console.log(error);});
-            }
+            },function(error) { console.log(error);});
+            
         }
         ,function(error) { console.log(error);});
     }
@@ -164,7 +162,9 @@ function getsuccess(){
     setTimeout("document.getElementById('info2').style.display='none'",3000);
     setTimeout("document.getElementById('info').style.display='none'",3000);
     setTimeout("document.getElementById('msg').style.display='none'",3000);
+    document.getElementById('getimmediate').focus();
     document.getElementById("getimmediate").removeEventListener("click",experienceonclick ,false);
+    console.log("close the app");
     document.getElementById("getimmediate").addEventListener("click", experience);
 }
 
@@ -176,7 +176,7 @@ function sendHTTP1() {
     action = getQueryString("action");
     console.log(showval);
     var oldType = deviceInfo.type;
-    console.log(oldType);
+    console.log("------------accesstoken------------"+accesstoken);
     // var md5string = "open_id=" + userInfo.open_id +  "&mac=" + deviceInfo.mac + "&model=" + deviceInfo.model + "&schemeId=1&skyworth";
     var md5string = "accessToken=" + accesstoken +  "&mac=" + deviceInfo.mac + "&model=" + deviceInfo.model + "&schemeId=" + showval + "&skyworth";
     console.log(md5string);
@@ -187,9 +187,9 @@ function sendHTTP1() {
              
              type: "GET",
              async: true,//url问题
-             url: "http://10.10.2.58:8089/index.html",
-             // url: "http://42.121.113.121:8094/ActivityPromotion/index.html",//http://active.tc.skysrt.com正式接口
-             data: {accessToken:accesstoken,device:JSON.stringify(deviceInfo),qqToken:qqtoken,schemeId:showval,type:"1",sign:md5sign,position:position,action:action},
+             url: "http://active.tc.skysrt.com/q/index.html",
+             // url: "http://10.10.2.58:8089/q/index.html",//http://active.tc.skysrt.com正式接口
+             data: {accessToken:accesstoken,device:JSON.stringify(deviceInfo),schemeId:showval,type:"1",sign:md5sign,position:position,action:action},
              // data: {userinfo:JSON.stringify(userInfo),device:JSON.stringify(deviceInfo),qqToken:qqtoken,schemeId:"1",type:"1",sign:md5sign},             
              dataType:"jsonp",
              jsonp:"callback",
@@ -220,7 +220,7 @@ function sendHTTP1() {
 
 function receive(data) {
     //alert("receive!" + data);
-    document.getElementById('msg').style.display="block";
+    
     console.log("receive" + data);
     console.log(data.result.code);
     if(data.result.code=="0")//成功
@@ -235,6 +235,7 @@ function receive(data) {
         console.log(data.result.code);
         document.getElementById('loading').style.display="none";
         document.getElementById('failnow').style.display="block";
+        document.getElementById('msg').style.display="block";
         getsuccess();
     }
     else if(data.result.code=="7"){//抱歉，您已经领取过了
@@ -247,16 +248,19 @@ function receive(data) {
     else if(data.result.code=="3"){//服务器异常，请稍后再试
         document.getElementById('loading').style.display="none";
         document.getElementById('failnow').style.display="block";
+        document.getElementById('msg').style.display="block";
         getsuccess();
     }
     else if(data.result.code=="2"){//开通会员失败
         document.getElementById('loading').style.display="none";
         document.getElementById('failvip').style.display="block";
+        document.getElementById('msg').style.display="block";
         getsuccess();
     }
     else {//获取活动信息失败
         document.getElementById('loading').style.display="none";
         document.getElementById('waiting').style.display="block";
+        document.getElementById('msg').style.display="block";
         getsuccess();
     }
 }

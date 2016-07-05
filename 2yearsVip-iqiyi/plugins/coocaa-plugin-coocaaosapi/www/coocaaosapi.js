@@ -1,3 +1,4 @@
+
 cordova.define("coocaa-plugin-coocaaosapi.coocaaosapi", function(require, exports, module) {
 
    var argscheck = require('cordova/argscheck'),
@@ -87,7 +88,6 @@ cordova.define("coocaa-plugin-coocaaosapi.coocaaosapi", function(require, export
              startapp.start([["action", "coocaa.intent.action.GAME_CENTER_MYGAME"]], success,error);
       }
 
-
 /*
 * 启动我的应用
 * mode: child / 其他，代表启动的是哪个模式下的程序
@@ -110,6 +110,14 @@ cordova.define("coocaa-plugin-coocaaosapi.coocaaosapi", function(require, export
       CoocaaOSApi.prototype.startUserSetting = function(success,error){
             argscheck.checkArgs('ff','CoocaaOSApi.startUserSetting',arguments);
              startapp.start([["action", "android.settings.ADD_ACCOUNT_SETTINGS"]], success,error);
+      }
+
+/*
+*启动用户设置，登录成功就消失
+*/
+      CoocaaOSApi.prototype.startUserSettingAndFinish = function(success,error){
+            argscheck.checkArgs('ff','CoocaaOSApi.startUserSettingAndFinish',arguments);
+             startapp.start([["action", "android.settings.ADD_ACCOUNT_SETTINGS"],[{'needFinish':true}]], success,error);
       }
 
 /*
@@ -144,6 +152,13 @@ cordova.define("coocaa-plugin-coocaaosapi.coocaaosapi", function(require, export
           startapp.start([["action", "android.settings.SYSTEM_UPGRADE"]], success,error);
       }
 
+/*
+* 获取用户access_token
+*/
+    CoocaaOSApi.prototype.getUserAccessToken = function(success,error){
+              argscheck.checkArgs('ff','CoocaaOSApi.getUserAccessToken',arguments);
+              exec(success,error,'CoocaaOSApi','getUserAccessToken',[]);
+          }
 /*******************************************影视相关***********************************************/
 
     function MovieItem(){
@@ -162,7 +177,7 @@ cordova.define("coocaa-plugin-coocaaosapi.coocaaosapi", function(require, export
 */
   CoocaaOSApi.prototype.startMovieDetail = function(detailid,success,error){
             argscheck.checkArgs('sff','CoocaaOSApi.startMovieDetail',arguments);
-            startapp.start([["action", "ccoocaa.intent.movie.detailinfo"],[{'id':detailid}]], success,error);
+            startapp.start([["action", "coocaa.intent.movie.detailinfo"],[{'id':detailid}]], success,error);
       }
 
 /*
@@ -176,9 +191,17 @@ cordova.define("coocaa-plugin-coocaaosapi.coocaaosapi", function(require, export
 /*
 *启动影视会员中心
 */
-   CoocaaOSApi.prototype.startMovieMemberCenter = function(success,error){
-        argscheck.checkArgs('ff','CoocaaOSApi.startMovieMemberCenter',arguments);
-        startapp.start([["action", "coocaa.intent.vip.center "]], success,error);
+   CoocaaOSApi.prototype.startMovieMemberCenter = function(urltype,success,error){
+        argscheck.checkArgs('sff','CoocaaOSApi.startMovieMemberCenter',arguments);
+        startapp.start([["action", "coocaa.intent.vip.center"],[{'url_type':urltype}]], success,error);
+   }
+
+/*
+*启动影视中心
+*/
+   CoocaaOSApi.prototype.startMovieHome = function(success,error){
+        argscheck.checkArgs('ff','CoocaaOSApi.startMovieHome',arguments);
+        startapp.start([["action", "coocaa.intent.movie.home"]], success,error);
    }
 
 /*
@@ -201,13 +224,13 @@ cordova.define("coocaa-plugin-coocaaosapi.coocaaosapi", function(require, export
         startapp.start([["action", "coocaa.intent.action.APP_STORE_HOME"]], success,error);
     }
 
-/*
-*启动应用商城榜单页
-*/
-   CoocaaOSApi.prototype.startAppStoreBD = function(success,error){
-         argscheck.checkArgs('ff','CoocaaOSApi.startAppStoreBD',arguments);
-         startapp.start([["action", "coocaa.intent.action.APP_STORE_BD"]], success,error);
-     }
+  /*
+  *启动应用商城榜单页
+  */
+     CoocaaOSApi.prototype.startAppStoreBD = function(rankid,success,error){
+           argscheck.checkArgs('nff','CoocaaOSApi.startAppStoreBD',arguments);
+           startapp.start([["action", "coocaa.intent.action.APP_STORE_RANKING"],[{'rankId':rankid }]], success,error);
+       }
 
 /*
 *启动应用商城分类页
@@ -634,6 +657,7 @@ CoocaaOSApi.prototype.addAppTaskListener = function(listener)
 }
 
 /*
+* 添加用户切换变化广播。
 *  {'userchangged':'true'}
           console.log( "USER_CHANGGED received!" + message.userchangged  );
 */
@@ -641,6 +665,43 @@ CoocaaOSApi.prototype.addUserChanggedListener = function(listener)
 {
     argscheck.checkArgs('f','CoocaaOSApi.addUserChanggedListener',arguments);
     brocaster.addEventListener( "USER_CHANGGED",listener);
+}
+
+
+/*
+* 添加用户支付广播
+* callback listener =
+*  {'presultstatus':123,'ptradeid':'xxx','presultmsg':'xxxxx','ppurchWay','xxxxxxxxx'}
+   console.log( "PURCHASE_CALLBACK received! resultstatus = " + message.presultstatus  );
+   console.log( "PURCHASE_CALLBACK received! tradeid = " + message.ptradeid  );
+   console.log( "PURCHASE_CALLBACK received! resultmsg = " + message.presultmsg  );
+   console.log( "PURCHASE_CALLBACK received! purchWay = " + message.ppurchWay  );
+*/
+CoocaaOSApi.prototype.addPurchaseOrderListener = function(listener)
+{
+    argscheck.checkArgs('f','CoocaaOSApi.addPurchaseOrderListener',arguments);
+    brocaster.addEventListener( "PURCHASE_CALLBACK",listener);
+}
+
+/*
+* 用户付费行为
+* appcode//商户编号ID,由酷开发布给第三方
+* tradeid//订单编号ID
+* productname//商品名称，例如“影视包年”
+*productsubname//实体商品简介
+* producttype//商品类型，在“实体”和“虚拟”中选择,实体订单必须走账号支付
+*specialtype//必填，通知支付结果给第三方开发者服务器URL，必须以http://开头，目前支持80端口 ，参数内容为，json格式字符串 例如：{"notify_url":"http://tv.coocaa.com/notify_url.html"}
+*amount//商品价格，以“元”为单位
+*count//实体商品个数（虚拟无需设置）
+*imgurl//实体商品图片地址（虚拟无需设置）
+*spec//实体商品规格（虚拟无需设置）
+ex:
+ var math =  Math.random() * 9000000 + 1000000;
+* coocaaosapi.purchaseOrder('1001',math+'','包月','product detail','虚拟',{'notify_url':'http://42.121.113.121:8090/aqiyiOrder/viewMain.html'},0.01,0,'','',f,f);
+*/
+CoocaaOSApi.prototype.purchaseOrder = function(appcode,tradeid,productname,productsubname,producttype,specialtype,amount,count,imgurl,spec,success,error){
+    argscheck.checkArgs('sssssonnssff','CoocaaOSApi.purchaseOrder',arguments);
+    exec(success,error,'CoocaaOSApi','purchaseOrder',[{'appcode':appcode},{'tradeid':tradeid},{'productname':productname},{'productsubname':productsubname},{'producttype':producttype},{'specialtype':specialtype},{'amount':amount},{'count':count},{'imgurl':imgurl},{'spec':spec}]);
 }
 
    module.exports = new CoocaaOSApi();
